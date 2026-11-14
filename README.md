@@ -11,9 +11,9 @@
 
 <p align="center">
   <a href="https://github.com/navinbhagat322/youtube-vink/actions/workflows/ci.yml"><img src="https://github.com/navinbhagat322/youtube-vink/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-  <a href="https://pypi.org/project/vink/"><img src="https://img.shields.io/pypi/v/vink" alt="PyPI version"></a>
-  <a href="https://pypi.org/project/vink/"><img src="https://img.shields.io/pypi/pyversions/vink" alt="Python versions"></a>
-  <a href="https://github.com/navinbhagat322/youtube-vink/blob/main/LICENSE"><img src="https://img.shields.io/pypi/l/vink" alt="License"></a>
+  <a href="https://pypi.org/project/vink/"><img src="https://img.shields.io/pypi/v/vink?cacheSeconds=3600" alt="PyPI version"></a>
+  <a href="https://pypi.org/project/vink/"><img src="https://img.shields.io/pypi/pyversions/vink?cacheSeconds=3600" alt="Python versions"></a>
+  <a href="https://github.com/navinbhagat322/youtube-vink/blob/main/LICENSE"><img src="https://img.shields.io/pypi/l/vink?cacheSeconds=3600" alt="License"></a>
 </p>
 
 ## Why
