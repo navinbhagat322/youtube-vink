@@ -70,7 +70,7 @@ MetadataSource.get_metadata ──┐            RawTranscript (segments)
 | Port | Responsibility | Current adapter |
 |------|----------------|-----------------|
 | `TranscriptSource` | List and fetch caption tracks | `YouTubeTranscriptSource` (youtube-transcript-api), wrapped by `CachingTranscriptSource` |
-| `MetadataSource` | Title and channel | `OEmbedMetadataSource` (YouTube oEmbed) |
+| `MetadataSource` | Title and channel | `OEmbedMetadataSource` (YouTube oEmbed), wrapped by `CachingMetadataSource` |
 | `Cache` | Key-value storage for the caching decorator | `FileCache` |
 | `Renderer` | Turn a transcript or chunk into text | `MarkdownRenderer` |
 | `Sink` | Deliver rendered output | `LocalDirectorySink` |
@@ -80,11 +80,13 @@ translate library types and exceptions at the boundary.
 
 ### Caching as a decorator
 
-`CachingTranscriptSource` implements `TranscriptSource` by wrapping another
-`TranscriptSource`. Services don't know caching exists. Turning it off
-(`VINK_USE_CACHE=false`) just means bootstrap skips the wrapper. Raw segments
-are cached, not cleaned paragraphs, so improvements to cleaning apply to cached
-videos straight away.
+`CachingTranscriptSource` and `CachingMetadataSource` implement their ports by
+wrapping another implementation of the same port. Services don't know caching
+exists. Turning it off (`VINK_USE_CACHE=false`) just means bootstrap skips the
+wrappers. Entries are stored with a timestamp (`TimedEntries`), so each kind of
+data can have its own lifetime: caption text never expires, track lists expire
+after a day, metadata after a week. Raw segments are cached, not cleaned
+paragraphs, so improvements to cleaning apply to cached videos straight away.
 
 ## Error handling
 

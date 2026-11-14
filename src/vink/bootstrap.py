@@ -12,11 +12,17 @@ from typing import Self
 import httpx
 
 from vink import __version__
-from vink.adapters.cache import CachingTranscriptSource, FileCache
+from vink.adapters.cache import (
+    CachingMetadataSource,
+    CachingTranscriptSource,
+    FileCache,
+    TimedEntries,
+)
 from vink.adapters.render import MarkdownRenderer
 from vink.adapters.sinks import LocalDirectorySink
 from vink.adapters.youtube import OEmbedMetadataSource, YouTubeTranscriptSource
 from vink.config import Settings
+from vink.ports.metadata_source import MetadataSource
 from vink.ports.transcript_source import TranscriptSource
 from vink.services import ExportService, TranscriptService
 
@@ -69,10 +75,13 @@ def build_container(settings: Settings | None = None) -> Container:
     )
 
     source: TranscriptSource = YouTubeTranscriptSource()
+    metadata: MetadataSource = OEmbedMetadataSource(http_client)
     if resolved.use_cache:
-        source = CachingTranscriptSource(source, FileCache(resolved.cache_dir))
+        entries = TimedEntries(FileCache(resolved.cache_dir))
+        source = CachingTranscriptSource(source, entries)
+        metadata = CachingMetadataSource(metadata, entries)
 
-    transcripts = TranscriptService(source=source, metadata=OEmbedMetadataSource(http_client))
+    transcripts = TranscriptService(source=source, metadata=metadata)
     exports = ExportService(
         renderers=[MarkdownRenderer()],
         sink=LocalDirectorySink(resolved.output_dir),
