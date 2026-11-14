@@ -8,8 +8,8 @@ the conventions every change follows.
 You need Python 3.11+ and [uv](https://docs.astral.sh/uv/).
 
 ```bash
-git clone https://github.com/OWNER/vink.git
-cd vink
+git clone https://github.com/navinbhagat322/youtube-vink.git
+cd youtube-vink
 uv sync                      # creates .venv with runtime + dev dependencies
 uv run pre-commit install    # runs format, lint and type checks before each commit
 ```

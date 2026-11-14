@@ -1,8 +1,9 @@
 # vink
 
-[![CI](https://github.com/OWNER/vink/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/vink/actions/workflows/ci.yml)
+[![CI](https://github.com/navinbhagat322/youtube-vink/actions/workflows/ci.yml/badge.svg)](https://github.com/navinbhagat322/youtube-vink/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/python-3.11%2B-blue)
 ![License: MIT](https://img.shields.io/badge/license-MIT-green)
+[![PyPI](https://img.shields.io/pypi/v/vink)](https://pypi.org/project/vink/)
 
 Turn YouTube transcripts into clean, timestamped Markdown and into complete,
 detailed notes instead of short summaries.
@@ -32,13 +33,25 @@ so an AI client can write notes for each part without leaving anything out.
 
 ## Installation
 
-Requires Python 3.11+ and [uv](https://docs.astral.sh/uv/).
+Requires Python 3.11+.
+
+From PyPI, as a standalone command:
 
 ```bash
-git clone https://github.com/OWNER/vink.git
-cd vink
+uv tool install vink      # or: pipx install vink
+vink --version
+```
+
+From source (for development), with [uv](https://docs.astral.sh/uv/):
+
+```bash
+git clone https://github.com/navinbhagat322/youtube-vink.git
+cd youtube-vink
 uv sync
 ```
+
+The examples below use `uv run vink` from a source checkout. With the PyPI
+install, run `vink` directly.
 
 ## Quickstart
 
@@ -115,13 +128,16 @@ Add vink to your Claude Desktop config. On macOS it is at
 {
   "mcpServers": {
     "vink": {
-      "command": "uv",
-      "args": ["--directory", "/absolute/path/to/vink", "run", "vink", "mcp"],
+      "command": "uvx",
+      "args": ["vink", "mcp"],
       "env": { "VINK_OUTPUT_DIR": "/absolute/path/to/your/notes" }
     }
   }
 }
 ```
+
+If Claude Desktop cannot find `uvx`, use its absolute path (`which uvx`).
+To run from a source checkout, see [docs/mcp.md](docs/mcp.md).
 
 Restart Claude Desktop, then either:
 

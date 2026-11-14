@@ -36,10 +36,10 @@ dependencies = [
 vink = "vink.interfaces.cli.app:main"
 
 [project.urls]
-Documentation = "https://github.com/OWNER/vink#readme"
-Issues = "https://github.com/OWNER/vink/issues"
-Source = "https://github.com/OWNER/vink"
-Changelog = "https://github.com/OWNER/vink/blob/main/CHANGELOG.md"
+Documentation = "https://github.com/navinbhagat322/youtube-vink#readme"
+Issues = "https://github.com/navinbhagat322/youtube-vink/issues"
+Source = "https://github.com/navinbhagat322/youtube-vink"
+Changelog = "https://github.com/navinbhagat322/youtube-vink/blob/main/CHANGELOG.md"
 
 [dependency-groups]
 dev = [

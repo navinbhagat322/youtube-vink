@@ -18,8 +18,8 @@ Edit `claude_desktop_config.json`:
 {
   "mcpServers": {
     "vink": {
-      "command": "uv",
-      "args": ["--directory", "/absolute/path/to/vink", "run", "vink", "mcp"],
+      "command": "uvx",
+      "args": ["vink", "mcp"],
       "env": {
         "VINK_OUTPUT_DIR": "/absolute/path/to/your/notes",
         "VINK_LANGUAGES": "en"
@@ -29,12 +29,17 @@ Edit `claude_desktop_config.json`:
 }
 ```
 
+`uvx` downloads and runs the latest vink from PyPI. If Claude Desktop cannot
+find `uvx`, use its absolute path (run `which uvx`). To run from a source
+checkout instead, use `"command": "uv"` with
+`"args": ["--directory", "/absolute/path/to/youtube-vink", "run", "vink", "mcp"]`.
+
 Restart Claude Desktop. vink's tools appear in the tools menu.
 
 ### Claude Code
 
 ```bash
-claude mcp add vink -- uv --directory /absolute/path/to/vink run vink mcp
+claude mcp add vink -- uvx vink mcp
 ```
 
 ## Tools

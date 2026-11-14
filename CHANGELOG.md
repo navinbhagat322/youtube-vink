@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `get_chunk`, `get_transcript`, `save_transcript` and `save_notes`, and a
   `make_notes` prompt with `detailed-notes` and `clean-transcript` styles.
 - Configuration through `VINK_*` environment variables or a `.env` file.
+- Distribution on PyPI (`uv tool install vink`, `uvx vink mcp`).
 
-[Unreleased]: https://github.com/OWNER/vink/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/OWNER/vink/releases/tag/v0.1.0
+[Unreleased]: https://github.com/navinbhagat322/youtube-vink/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/navinbhagat322/youtube-vink/releases/tag/v0.1.0
