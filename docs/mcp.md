@@ -43,6 +43,21 @@ Restart Claude Desktop. vink's tools appear in the tools menu.
 claude mcp add vink -- uvx vink mcp
 ```
 
+### Remote clients (Streamable HTTP)
+
+To use vink from a client on another machine, for example a hosted agent
+platform, run it as an HTTP server:
+
+```bash
+VINK_AUTH_TOKEN='a-long-random-secret' vink mcp --transport http --port 8000
+```
+
+Clients connect to `http://HOST:8000/mcp` with the header
+`Authorization: Bearer a-long-random-secret`. `GET /healthz` reports whether
+the server is up. [hosting.md](hosting.md) explains how to publish it safely
+with a tunnel, and how to use a proxy when the server's IP is blocked by
+YouTube.
+
 ## Tools
 
 | Tool | Arguments | Returns |

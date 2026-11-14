@@ -22,6 +22,29 @@ these ways (highest priority first):
 | HTTP timeout | `VINK_HTTP_TIMEOUT` | `10` | — | Timeout in seconds for metadata requests. |
 | Log level | `VINK_LOG_LEVEL` | `WARNING` | `-v` (sets `INFO`) | `DEBUG`, `INFO`, `WARNING` or `ERROR`. Logs go to stderr. |
 
+### Network and proxies
+
+| Setting | Environment variable | Default | Description |
+|---------|----------------------|---------|-------------|
+| Proxy URL | `VINK_PROXY_URL` | none | HTTP(S) proxy for all requests to YouTube, e.g. `http://user:pass@proxy.example.com:8080`. Must include a numeric port. Takes precedence over `HTTPS_PROXY` / `HTTP_PROXY`. |
+| Webshare username | `VINK_WEBSHARE_USERNAME` | none | Webshare rotating residential proxy. Set together with the password; not combinable with `VINK_PROXY_URL`. |
+| Webshare password | `VINK_WEBSHARE_PASSWORD` | none | See above. |
+
+See [hosting.md](hosting.md) for when and why you need a proxy.
+
+### MCP server
+
+| Setting | Environment variable | Default | CLI option | Description |
+|---------|----------------------|---------|------------|-------------|
+| Transport | `VINK_MCP_TRANSPORT` | `stdio` | `--transport`, `-t` | `stdio` for local clients, `http` for Streamable HTTP. |
+| Host | `VINK_MCP_HOST` | `127.0.0.1` | `--host` | Interface the HTTP server binds to. |
+| Port | `VINK_MCP_PORT` | `8000` | `--port`, `-p` | HTTP server port. |
+| Access token | `VINK_AUTH_TOKEN` | none | — | Bearer token clients must send. Required for HTTP, at least 16 characters. |
+| Allowed hosts | `VINK_ALLOWED_HOSTS` | any | — | Comma-separated `Host` header values to accept, e.g. `vink.example.com`. |
+
+`--insecure-no-auth` runs the HTTP server without a token, for local testing
+only; it is refused unless the host is `127.0.0.1`, `localhost` or `::1`.
+
 ¹ `~/Library/Caches/vink` on macOS, `~/.cache/vink` on Linux,
 `%LOCALAPPDATA%\vink\Cache` on Windows.
 

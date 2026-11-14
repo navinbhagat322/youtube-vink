@@ -14,7 +14,7 @@ src/vink/
 ├── processing/    Pure functions: track selection, cleaning, paragraphs, chunking.
 ├── services/      Use cases that orchestrate ports and processing.
 ├── adapters/      Implementations of ports. All I/O lives here.
-├── interfaces/    Entry points: CLI, MCP server.
+├── interfaces/    Entry points: CLI, MCP server (stdio and HTTP).
 ├── styles/        Note-style prompt templates.
 ├── bootstrap.py   Composition root: picks the adapter for each port.
 └── config.py      Typed settings.
@@ -69,7 +69,7 @@ MetadataSource.get_metadata ──┐            RawTranscript (segments)
 
 | Port | Responsibility | Current adapter |
 |------|----------------|-----------------|
-| `TranscriptSource` | List and fetch caption tracks | `YouTubeTranscriptSource` (youtube-transcript-api), wrapped by `CachingTranscriptSource` |
+| `TranscriptSource` | List and fetch caption tracks | `YouTubeTranscriptSource` (youtube-transcript-api, optionally through a proxy), wrapped by `CachingTranscriptSource` |
 | `MetadataSource` | Title and channel | `OEmbedMetadataSource` (YouTube oEmbed), wrapped by `CachingMetadataSource` |
 | `Cache` | Key-value storage for the caching decorator | `FileCache` |
 | `Renderer` | Turn a transcript or chunk into text | `MarkdownRenderer` |
@@ -87,6 +87,17 @@ wrappers. Entries are stored with a timestamp (`TimedEntries`), so each kind of
 data can have its own lifetime: caption text never expires, track lists expire
 after a day, metadata after a week. Raw segments are cached, not cleaned
 paragraphs, so improvements to cleaning apply to cached videos straight away.
+
+## Network access and hosting
+
+Proxy settings are translated by `bootstrap.proxy_options()` into
+`adapters.youtube.ProxyOptions`, which both YouTube adapters use: the transcript
+source via `youtube-transcript-api`'s proxy configuration, and the metadata
+source via the shared `httpx` client. Services never see proxies.
+
+`interfaces/mcp/http.py` serves the same `MCPServer` over Streamable HTTP. It
+adds a health check and wraps the app in `BearerTokenMiddleware`; the MCP tools
+are unchanged. See [ADR 0004](adr/0004-http-transport-and-proxies.md).
 
 ## Error handling
 

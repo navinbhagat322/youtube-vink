@@ -39,6 +39,8 @@ so an AI client can write notes for each part without leaving anything out.
   chunk by chunk and write full notes, with bundled note-style prompts.
 - **Local cache.** Each transcript is fetched once; the list of available
   languages is refreshed daily.
+- **Runs anywhere.** Serve MCP over HTTP with token authentication, or route
+  requests through a residential proxy when YouTube blocks a cloud server.
 
 ## Installation
 
@@ -99,7 +101,7 @@ duration: "18:25"
 vink transcript URL [--lang en,hi] [--output-dir DIR] [--stdout]
                     [--translate | --no-translate] [--cache | --no-cache]
 vink languages URL
-vink mcp
+vink mcp [--transport stdio|http] [--host HOST] [--port PORT]
 vink --version
 ```
 
@@ -107,7 +109,7 @@ vink --version
 |---------|--------------|
 | `transcript` | Fetches a transcript and saves it as Markdown (or prints it with `--stdout`). |
 | `languages` | Lists the caption tracks a video has. |
-| `mcp` | Runs the MCP server over stdio. |
+| `mcp` | Runs the MCP server: over stdio for local clients (default), or over HTTP for remote ones. |
 
 Examples:
 
@@ -164,7 +166,31 @@ Restart Claude Desktop, then either:
 | `save_notes` | Save notes the client has written |
 
 Bundled note styles: `detailed-notes` (default) and `clean-transcript`.
-See [docs/mcp.md](docs/mcp.md) for details.
+See [docs/mcp.md](docs/mcp.md) for details and setup for other clients.
+
+## Running on a server
+
+YouTube blocks most requests from cloud servers (AWS, GCP, hosted sandboxes).
+vink supports two ways around it:
+
+- **Host it at home and connect remotely.** Run vink over HTTP on a machine
+  with a residential connection and publish it with a tunnel. No proxy needed.
+
+  ```bash
+  VINK_AUTH_TOKEN='a-long-random-secret' vink mcp --transport http --port 8000
+  ```
+
+- **Use a residential proxy** wherever vink runs:
+
+  ```bash
+  VINK_PROXY_URL=http://user:pass@proxy.example.com:8080 vink mcp
+  ```
+
+  Webshare rotating proxies are supported natively via
+  `VINK_WEBSHARE_USERNAME` and `VINK_WEBSHARE_PASSWORD`.
+
+Step-by-step instructions, including Cloudflare Tunnel and systemd, are in
+[docs/hosting.md](docs/hosting.md).
 
 ## Configuration
 
@@ -176,6 +202,8 @@ variable or a `.env` file. Common ones:
 | `VINK_LANGUAGES` | `en` | Preferred languages, comma-separated |
 | `VINK_OUTPUT_DIR` | `output` (CLI), `~/Documents/vink` (MCP) | Where files are saved |
 | `VINK_CHUNK_SECONDS` | `600` | Length of one part for `get_chunk` |
+| `VINK_PROXY_URL` | none | Proxy for requests to YouTube |
+| `VINK_AUTH_TOKEN` | none | Required token for `vink mcp --transport http` |
 
 The full list is in [docs/configuration.md](docs/configuration.md).
 
@@ -194,8 +222,8 @@ destinations (Notion, Obsidian) can be added without touching the core. See
 
 - Only videos that have captions (manual or auto-generated) are supported.
   Transcribing audio for videos without captions is planned.
-- YouTube often blocks requests from cloud-server IP addresses. Run vink from
-  your own machine.
+- YouTube often blocks requests from cloud-server IP addresses. See
+  [Running on a server](#running-on-a-server).
 - vink uses YouTube's internal caption endpoints through
   [`youtube-transcript-api`](https://github.com/jdepoix/youtube-transcript-api).
   These can change without notice. Keep dependencies up to date.

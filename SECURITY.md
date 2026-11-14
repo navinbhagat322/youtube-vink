@@ -26,5 +26,10 @@ will credit you in the release notes unless you prefer otherwise.
   escape the output directory is refused. Report any way around this.
 - Transcript text and video titles are treated as untrusted data. They are
   rendered as escaped text and never executed.
-- vink stores no credentials. If a future feature adds API keys, they will be
-  read from the environment only.
+- `vink mcp --transport http` refuses to start without an access token
+  (`VINK_AUTH_TOKEN`), except with `--insecure-no-auth` on a loopback address.
+  Tokens are compared in constant time. Report any way to reach the MCP
+  endpoint without a valid token.
+- Proxy URLs and passwords are never printed in error messages or logs.
+- vink stores no credentials. Tokens and proxy credentials are read from the
+  environment only.
