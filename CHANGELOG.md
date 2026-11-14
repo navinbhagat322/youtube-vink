@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- The MCP server now saves files to `~/Documents/vink` by default. Previously it
+  used a relative `output` folder, which fails when an MCP client such as
+  Claude Desktop starts the server from `/`.
+- Newly added captions are now found: the cached list of available tracks
+  expires after one day instead of never.
+
+### Changed
+
+- Video titles are cached for seven days, so reading a long video part by part
+  no longer makes a network request for every part.
+- Officially support Python 3.14.
+- Each release now also creates a GitHub release with the built files.
+
 ## [0.1.0] - 2026-11-14
 
 ### Added

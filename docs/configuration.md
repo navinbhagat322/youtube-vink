@@ -14,7 +14,7 @@ these ways (highest priority first):
 |---------|----------------------|---------|------------|-------------|
 | Languages | `VINK_LANGUAGES` | `en` | `--lang`, `-l` | Preferred transcript languages, comma-separated, most preferred first. `original` means the language spoken in the video. |
 | Allow translation | `VINK_ALLOW_TRANSLATION` | `true` | `--translate` / `--no-translate` | Use YouTube machine translation when no track matches any preferred language. |
-| Output directory | `VINK_OUTPUT_DIR` | `output` | `--output-dir`, `-o` | Where saved files go. Relative paths are relative to the working directory. |
+| Output directory | `VINK_OUTPUT_DIR` | `output` (CLI), `~/Documents/vink` (MCP server)² | `--output-dir`, `-o` | Where saved files go. Relative paths are relative to the working directory. |
 | Output format | `VINK_OUTPUT_FORMAT` | `markdown` | `--format`, `-f` | Format for saved and printed output. |
 | Cache directory | `VINK_CACHE_DIR` | platform user cache dir¹ | — | Where fetched transcripts are cached. |
 | Use cache | `VINK_USE_CACHE` | `true` | `--cache` / `--no-cache` | Read from and write to the transcript cache. |
@@ -24,6 +24,10 @@ these ways (highest priority first):
 
 ¹ `~/Library/Caches/vink` on macOS, `~/.cache/vink` on Linux,
 `%LOCALAPPDATA%\vink\Cache` on Windows.
+
+² MCP clients usually start servers with `/` as the working directory, so the
+MCP server uses an absolute folder in your Documents directory unless
+`VINK_OUTPUT_DIR` is set.
 
 ## How a transcript track is chosen
 
@@ -42,9 +46,17 @@ Codes match exactly first, then by base language, so `en` matches `en-GB` and
 If nothing matches, vink lists the available languages. You can also check
 first with `vink languages URL`.
 
+## What is cached, and for how long
+
+| Data | Kept for | Why |
+|------|----------|-----|
+| Fetched caption text | Forever | A published caption track does not change. |
+| List of available tracks | 1 day | Creators sometimes add captions after upload. |
+| Title and channel | 7 days | These change rarely. |
+
 ## Clearing the cache
 
-The cache only stores fetched captions. It is safe to delete at any time:
+The cache only stores data fetched from YouTube. It is safe to delete at any time:
 
 ```bash
 rm -rf ~/Library/Caches/vink   # macOS

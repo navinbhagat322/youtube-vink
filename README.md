@@ -29,7 +29,8 @@ so an AI client can write notes for each part without leaving anything out.
   and similar apps.
 - **MCP server.** Lets Claude Desktop (or any MCP client) read long videos
   chunk by chunk and write full notes, with bundled note-style prompts.
-- **Local cache.** Each transcript is fetched once.
+- **Local cache.** Each transcript is fetched once; the list of available
+  languages is refreshed daily.
 
 ## Installation
 
@@ -50,17 +51,16 @@ cd youtube-vink
 uv sync
 ```
 
-The examples below use `uv run vink` from a source checkout. With the PyPI
-install, run `vink` directly.
+From a source checkout, prefix the commands below with `uv run`.
 
 ## Quickstart
 
 ```bash
-uv run vink transcript https://youtu.be/aircAruvnKk
+vink transcript https://youtu.be/aircAruvnKk
 ```
 
 ```text
-/path/to/vink/output/But what is a neural network Deep learning chapter 1.md
+/your/current/folder/output/But what is a neural network Deep learning chapter 1.md
 ```
 
 The file looks like this:
@@ -105,16 +105,16 @@ Examples:
 
 ```bash
 # Hindi if available, otherwise English
-uv run vink transcript https://youtu.be/VIDEO_ID --lang hi,en
+vink transcript https://youtu.be/VIDEO_ID --lang hi,en
 
 # The language spoken in the video, printed to the terminal
-uv run vink transcript VIDEO_ID --lang original --stdout
+vink transcript VIDEO_ID --lang original --stdout
 
 # See what is available first
-uv run vink languages https://youtu.be/VIDEO_ID
+vink languages https://youtu.be/VIDEO_ID
 ```
 
-Add `-v` before the command for progress logs, e.g. `uv run vink -v transcript ...`.
+Add `-v` before the command for progress logs, e.g. `vink -v transcript ...`.
 
 Exit codes: `0` success, `1` the transcript could not be fetched, `2` invalid
 input or options.
@@ -130,13 +130,14 @@ Add vink to your Claude Desktop config. On macOS it is at
     "vink": {
       "command": "uvx",
       "args": ["vink", "mcp"],
-      "env": { "VINK_OUTPUT_DIR": "/absolute/path/to/your/notes" }
+      "env": { "VINK_LANGUAGES": "en" }
     }
   }
 }
 ```
 
-If Claude Desktop cannot find `uvx`, use its absolute path (`which uvx`).
+Notes are saved to `~/Documents/vink` unless you set `VINK_OUTPUT_DIR` in
+`env`. If Claude Desktop cannot find `uvx`, use its absolute path (`which uvx`).
 To run from a source checkout, see [docs/mcp.md](docs/mcp.md).
 
 Restart Claude Desktop, then either:
@@ -165,7 +166,7 @@ variable or a `.env` file. Common ones:
 | Variable | Default | Meaning |
 |----------|---------|---------|
 | `VINK_LANGUAGES` | `en` | Preferred languages, comma-separated |
-| `VINK_OUTPUT_DIR` | `output` | Where files are saved |
+| `VINK_OUTPUT_DIR` | `output` (CLI), `~/Documents/vink` (MCP) | Where files are saved |
 | `VINK_CHUNK_SECONDS` | `600` | Length of one part for `get_chunk` |
 
 The full list is in [docs/configuration.md](docs/configuration.md).
