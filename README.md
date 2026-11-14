@@ -1,12 +1,20 @@
-# vink
+<p align="center">
+  <img src="https://raw.githubusercontent.com/navinbhagat322/youtube-vink/main/docs/assets/logo.png" alt="vink logo" width="112" height="112">
+</p>
 
-[![CI](https://github.com/navinbhagat322/youtube-vink/actions/workflows/ci.yml/badge.svg)](https://github.com/navinbhagat322/youtube-vink/actions/workflows/ci.yml)
-![Python](https://img.shields.io/badge/python-3.11%2B-blue)
-![License: MIT](https://img.shields.io/badge/license-MIT-green)
-[![PyPI](https://img.shields.io/pypi/v/vink)](https://pypi.org/project/vink/)
+<h1 align="center">vink</h1>
 
-Turn YouTube transcripts into clean, timestamped Markdown and into complete,
-detailed notes instead of short summaries.
+<p align="center">
+  Turn YouTube transcripts into clean, timestamped Markdown and into complete,
+  detailed notes instead of short summaries.
+</p>
+
+<p align="center">
+  <a href="https://github.com/navinbhagat322/youtube-vink/actions/workflows/ci.yml"><img src="https://github.com/navinbhagat322/youtube-vink/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://pypi.org/project/vink/"><img src="https://img.shields.io/pypi/v/vink" alt="PyPI version"></a>
+  <a href="https://pypi.org/project/vink/"><img src="https://img.shields.io/pypi/pyversions/vink" alt="Python versions"></a>
+  <a href="https://github.com/navinbhagat322/youtube-vink/blob/main/LICENSE"><img src="https://img.shields.io/pypi/l/vink" alt="License"></a>
+</p>
 
 ## Why
 

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-labelledby="title">
+  <title id="title">vink</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7C5CFF"/>
+      <stop offset="1" stop-color="#2F7CF6"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="120" height="120" rx="28" fill="url(#bg)"/>
+  <!-- Play button: the video -->
+  <path d="M32 42 L32 86 L64 64 Z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="8" stroke-linejoin="round"/>
+  <!-- Lines of text: the notes it becomes -->
+  <g stroke="#FFFFFF" stroke-width="8" stroke-linecap="round">
+    <line x1="78" y1="46" x2="100" y2="46"/>
+    <line x1="78" y1="64" x2="96" y2="64"/>
+    <line x1="78" y1="82" x2="90" y2="82"/>
+  </g>
+</svg>
