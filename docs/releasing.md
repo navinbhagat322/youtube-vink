@@ -53,8 +53,9 @@ add `repository-url: https://test.pypi.org/legacy/` to the publish step.
 5. The `Release` workflow checks that the tag matches the version, runs the
    tests, builds the sdist and wheel, and publishes them. If you configured a
    reviewer, approve the deployment under the workflow run.
-6. Optionally create a GitHub release from the tag with the changelog section
-   as its notes.
+6. After publishing, the workflow creates a GitHub release for the tag with the
+   built files attached and generated notes. Edit it to paste the changelog
+   section if you want hand-written notes.
 
 ## Building locally
 
