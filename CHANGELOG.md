@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-11-14
+
 ### Fixed
 
 - The MCP server now saves files to `~/Documents/vink` by default. Previously it
@@ -21,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   no longer makes a network request for every part.
 - Officially support Python 3.14.
 - Each release now also creates a GitHub release with the built files.
+- Added a project logo.
 
 ## [0.1.0] - 2026-11-14
 
@@ -40,5 +43,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Configuration through `VINK_*` environment variables or a `.env` file.
 - Distribution on PyPI (`uv tool install vink`, `uvx vink mcp`).
 
-[Unreleased]: https://github.com/navinbhagat322/youtube-vink/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/navinbhagat322/youtube-vink/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/navinbhagat322/youtube-vink/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/navinbhagat322/youtube-vink/releases/tag/v0.1.0
