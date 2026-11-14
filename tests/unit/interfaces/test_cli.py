@@ -7,7 +7,7 @@ from typer.testing import CliRunner
 from tests.fakes import FakeTranscriptSource
 from vink import __version__
 from vink.bootstrap import Container
-from vink.config import Settings
+from vink.config import Settings, default_mcp_output_dir
 from vink.domain.errors import TranscriptsDisabledError
 from vink.interfaces.cli.app import EXIT_ERROR, EXIT_USAGE, CliState, app
 
@@ -115,3 +115,38 @@ def test_languages_lists_tracks(runner: CliRunner, state: CliState) -> None:
     assert lines[0].split() == ["CODE", "TYPE", "LANGUAGE"]
     assert lines[1].split() == ["en", "manual", "English"]
     assert lines[2].split()[:2] == ["hi", "generated"]
+
+
+class _ServerStub:
+    started: tuple[Settings, str]
+
+    def __init__(self, container: Container) -> None:
+        self.container = container
+
+    def run(self, transport: str) -> None:
+        _ServerStub.started = (self.container.settings, transport)
+
+
+def test_mcp_defaults_to_absolute_output_dir(
+    runner: CliRunner, state: CliState, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.delenv("VINK_OUTPUT_DIR", raising=False)
+    monkeypatch.setattr("vink.interfaces.mcp.server.create_server", _ServerStub)
+
+    result = runner.invoke(app, ["mcp"], obj=state)
+
+    assert result.exit_code == 0, result.output
+    settings, transport = _ServerStub.started
+    assert settings.output_dir == default_mcp_output_dir()
+    assert transport == "stdio"
+
+
+def test_mcp_respects_configured_output_dir(
+    runner: CliRunner, state: CliState, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    monkeypatch.setenv("VINK_OUTPUT_DIR", str(tmp_path))
+    monkeypatch.setattr("vink.interfaces.mcp.server.create_server", _ServerStub)
+
+    runner.invoke(app, ["mcp"], obj=state)
+
+    assert _ServerStub.started[0].output_dir == tmp_path

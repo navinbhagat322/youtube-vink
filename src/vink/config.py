@@ -7,13 +7,18 @@ Nothing outside this module reads environment variables.
 """
 
 from pathlib import Path
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal, Self
 
-from platformdirs import user_cache_path
+from platformdirs import user_cache_path, user_documents_path
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 LogLevel = Literal["DEBUG", "INFO", "WARNING", "ERROR"]
+
+
+def default_mcp_output_dir() -> Path:
+    """Output folder for the MCP server when none is configured: ``~/Documents/vink``."""
+    return user_documents_path() / "vink"
 
 
 class Settings(BaseSettings):
@@ -69,3 +74,13 @@ class Settings(BaseSettings):
                 raise ValueError("at least one language code is required")
             return codes
         return value
+
+    def with_defaults(self, **defaults: Any) -> Self:
+        """Return a copy where fields the user did not set take the given values.
+
+        A field counts as set if it came from an explicit argument, an
+        environment variable or the ``.env`` file. Values are trusted
+        program constants and are not re-validated.
+        """
+        missing = {k: v for k, v in defaults.items() if k not in self.model_fields_set}
+        return self.model_copy(update=missing) if missing else self

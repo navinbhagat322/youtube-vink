@@ -1,6 +1,6 @@
 """The ``vink`` command-line application."""
 
-from collections.abc import Callable, Iterator
+from collections.abc import Callable, Iterator, Mapping
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
@@ -11,7 +11,7 @@ from pydantic import ValidationError
 
 from vink import __version__
 from vink.bootstrap import Container, build_container
-from vink.config import Settings
+from vink.config import Settings, default_mcp_output_dir
 from vink.domain.errors import InvalidInputError, VinkError
 from vink.domain.video_ref import parse_video_ref
 from vink.interfaces.logging_setup import configure_logging
@@ -145,18 +145,34 @@ def mcp_command(ctx: typer.Context) -> None:
     """Run the MCP server over stdio (for Claude Desktop and other MCP clients)."""
     from vink.interfaces.mcp.server import create_server  # noqa: PLC0415 - heavy, CLI-optional
 
-    with _session(ctx, {}) as container:
+    # MCP clients often start servers with "/" as the working directory, so a
+    # relative output folder would be unwritable. Default to an absolute one.
+    with _session(ctx, {}, defaults={"output_dir": default_mcp_output_dir()}) as container:
         create_server(container).run("stdio")
 
 
 @contextmanager
-def _session(ctx: typer.Context, overrides: dict[str, Any]) -> Iterator[Container]:
-    """Build settings and a container, and turn vink errors into clean CLI exits."""
+def _session(
+    ctx: typer.Context,
+    overrides: Mapping[str, Any],
+    *,
+    defaults: Mapping[str, Any] | None = None,
+) -> Iterator[Container]:
+    """Build settings and a container, and turn vink errors into clean CLI exits.
+
+    Args:
+        ctx: The Typer context carrying :class:`CliState`.
+        overrides: Values from command-line options; ``None`` means "not given".
+        defaults: Command-specific defaults, used only for settings the user did
+            not set through options, environment variables or ``.env``.
+    """
     state = ctx.obj if isinstance(ctx.obj, CliState) else CliState()
     try:
         settings = Settings(**{k: v for k, v in overrides.items() if v is not None})
     except ValidationError as exc:
         _fail(_describe_validation_error(exc), EXIT_USAGE)
+    if defaults:
+        settings = settings.with_defaults(**defaults)
 
     configure_logging("INFO" if state.verbose else settings.log_level)
     try:

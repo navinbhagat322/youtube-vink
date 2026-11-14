@@ -4,7 +4,7 @@ import pytest
 from pydantic import ValidationError
 
 from vink.bootstrap import build_container
-from vink.config import Settings
+from vink.config import Settings, default_mcp_output_dir
 
 
 class TestSettings:
@@ -47,3 +47,25 @@ def test_build_container_wires_services(tmp_path: Path, use_cache: bool) -> None
     with build_container(settings) as container:
         assert container.settings is settings
         assert container.exports.formats == ["markdown"]
+
+
+class TestWithDefaults:
+    def test_applies_to_unset_fields(self, tmp_path: Path) -> None:
+        settings = Settings().with_defaults(output_dir=tmp_path)
+
+        assert settings.output_dir == tmp_path
+
+    def test_keeps_values_from_environment(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
+        monkeypatch.setenv("VINK_OUTPUT_DIR", str(tmp_path / "mine"))
+
+        settings = Settings().with_defaults(output_dir=tmp_path / "default")
+
+        assert settings.output_dir == tmp_path / "mine"
+
+    def test_default_mcp_output_dir_is_absolute(self) -> None:
+        path = default_mcp_output_dir()
+
+        assert path.is_absolute()
+        assert path.name == "vink"

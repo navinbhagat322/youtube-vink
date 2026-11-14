@@ -29,7 +29,8 @@ Edit `claude_desktop_config.json`:
 }
 ```
 
-`uvx` downloads and runs the latest vink from PyPI. If Claude Desktop cannot
+`uvx` downloads and runs the latest vink from PyPI. `VINK_OUTPUT_DIR` is
+optional; without it, files are saved to `~/Documents/vink`. If Claude Desktop cannot
 find `uvx`, use its absolute path (run `which uvx`). To run from a source
 checkout instead, use `"command": "uv"` with
 `"args": ["--directory", "/absolute/path/to/youtube-vink", "run", "vink", "mcp"]`.
