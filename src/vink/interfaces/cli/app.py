@@ -141,14 +141,66 @@ def languages_command(
 
 
 @app.command("mcp")
-def mcp_command(ctx: typer.Context) -> None:
-    """Run the MCP server over stdio (for Claude Desktop and other MCP clients)."""
-    from vink.interfaces.mcp.server import create_server  # noqa: PLC0415 - heavy, CLI-optional
+def mcp_command(
+    ctx: typer.Context,
+    transport: Annotated[
+        str | None,
+        typer.Option(
+            "--transport",
+            "-t",
+            help="'stdio' (default) for local clients, or 'http' to serve over the network.",
+        ),
+    ] = None,
+    host: Annotated[
+        str | None,
+        typer.Option("--host", help="HTTP only: interface to bind (default 127.0.0.1)."),
+    ] = None,
+    port: Annotated[
+        int | None, typer.Option("--port", "-p", help="HTTP only: port (default 8000).")
+    ] = None,
+    insecure_no_auth: Annotated[
+        bool,
+        typer.Option(
+            "--insecure-no-auth",
+            help="HTTP only: allow requests without VINK_AUTH_TOKEN. Local testing only.",
+        ),
+    ] = False,
+) -> None:
+    """Run the MCP server, over stdio for local clients or HTTP for remote ones."""
+    # Heavy imports, only needed by this command.
+    from vink.interfaces.mcp.http import (  # noqa: PLC0415
+        MCP_PATH,
+        build_http_app,
+        check_http_security,
+        serve_http,
+    )
+    from vink.interfaces.mcp.server import create_server  # noqa: PLC0415
 
+    overrides = {"mcp_transport": transport, "mcp_host": host, "mcp_port": port}
     # MCP clients often start servers with "/" as the working directory, so a
     # relative output folder would be unwritable. Default to an absolute one.
-    with _session(ctx, {}, defaults={"output_dir": default_mcp_output_dir()}) as container:
-        create_server(container).run("stdio")
+    with _session(ctx, overrides, defaults={"output_dir": default_mcp_output_dir()}) as container:
+        settings = container.settings
+        server = create_server(container)
+        if settings.mcp_transport == "stdio":
+            server.run("stdio")
+            return
+
+        token = settings.auth_token.get_secret_value() if settings.auth_token else None
+        check_http_security(
+            host=settings.mcp_host, token=token, allow_unauthenticated=insecure_no_auth
+        )
+        http_app = build_http_app(
+            server, host=settings.mcp_host, token=token, allowed_hosts=settings.allowed_hosts
+        )
+        auth = "bearer token required" if token else "NO AUTHENTICATION"
+        typer.echo(
+            f"vink MCP server on http://{settings.mcp_host}:{settings.mcp_port}{MCP_PATH} ({auth})",
+            err=True,
+        )
+        serve_http(
+            http_app, host=settings.mcp_host, port=settings.mcp_port, log_level=settings.log_level
+        )
 
 
 @contextmanager
@@ -185,11 +237,20 @@ def _session(
 
 
 def _describe_validation_error(exc: ValidationError) -> str:
-    """Summarize pydantic validation errors as one line per invalid setting."""
-    return "\n".join(
-        f"Invalid value for {'.'.join(str(p) for p in error['loc'])}: {error['msg']}"
-        for error in exc.errors()
-    )
+    """Summarize pydantic validation errors as one line per invalid setting.
+
+    Settings are named by their environment variable, which is how most users
+    set them. Input values are never echoed because they may contain secrets.
+    """
+    lines = []
+    for error in exc.errors():
+        message = str(error["msg"]).removeprefix("Value error, ")
+        if error["loc"]:
+            name = "VINK_" + "_".join(str(part) for part in error["loc"]).upper()
+            lines.append(f"Invalid {name}: {message}")
+        else:
+            lines.append(f"Invalid settings: {message}")
+    return "\n".join(lines)
 
 
 def _fail(message: str, code: int) -> NoReturn:

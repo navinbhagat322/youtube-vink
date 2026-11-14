@@ -7,7 +7,7 @@ import requests
 import youtube_transcript_api as yta
 from youtube_transcript_api import YouTubeTranscriptApi
 
-from vink.adapters.youtube import YouTubeTranscriptSource
+from vink.adapters.youtube import ProxyOptions, YouTubeTranscriptSource
 from vink.domain.errors import (
     LanguageUnavailableError,
     TranscriptFetchError,
@@ -19,6 +19,7 @@ from vink.domain.models import TrackInfo, TrackKind, TrackSelection
 from vink.domain.video_ref import VideoRef
 
 VIDEO = VideoRef("aircAruvnKk")
+_PROXY = ProxyOptions(url="http://user:secret@proxy.example:8080")
 
 
 @dataclass
@@ -156,5 +157,30 @@ def test_library_errors_become_domain_errors(
 def test_blocked_error_explains_cause(api: _FakeApi) -> None:
     api.error = yta.RequestBlocked(VID)
 
-    with pytest.raises(TranscriptFetchError, match="blocking requests"):
+    with pytest.raises(TranscriptFetchError, match="VINK_PROXY_URL"):
         _source(api).list_tracks(VIDEO)
+
+
+def test_blocked_through_proxy_suggests_residential_proxy(api: _FakeApi) -> None:
+    api.error = yta.RequestBlocked(VID)
+    source = YouTubeTranscriptSource(api=cast(YouTubeTranscriptApi, api), proxy=_PROXY)
+
+    with pytest.raises(TranscriptFetchError, match="through the configured proxy"):
+        source.list_tracks(VIDEO)
+
+
+def test_proxy_network_error_hides_proxy_url(api: _FakeApi) -> None:
+    api.error = requests.exceptions.ProxyError("http://user:secret@proxy.example:8080 refused")
+    source = YouTubeTranscriptSource(api=cast(YouTubeTranscriptApi, api), proxy=_PROXY)
+
+    with pytest.raises(TranscriptFetchError) as info:
+        source.list_tracks(VIDEO)
+
+    assert "secret" not in str(info.value)
+    assert "VINK_PROXY_URL" in str(info.value)
+
+
+def test_default_client_is_built_with_proxy_config() -> None:
+    source = YouTubeTranscriptSource(proxy=_PROXY)
+
+    assert source._proxied

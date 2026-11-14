@@ -86,7 +86,7 @@ def test_invalid_setting_exits_with_usage_error(runner: CliRunner, state: CliSta
     result = runner.invoke(app, ["transcript", VIDEO_URL, "--lang", " , "], obj=state)
 
     assert result.exit_code == EXIT_USAGE
-    assert "Invalid value for languages" in result.output
+    assert "Invalid VINK_LANGUAGES" in result.output
 
 
 def test_unknown_format_exits_with_usage_error(runner: CliRunner, state: CliState) -> None:
@@ -150,3 +150,58 @@ def test_mcp_respects_configured_output_dir(
     runner.invoke(app, ["mcp"], obj=state)
 
     assert _ServerStub.started[0].output_dir == tmp_path
+
+
+class TestMcpHttpCommand:
+    @pytest.fixture
+    def served(self, monkeypatch: pytest.MonkeyPatch) -> dict[str, object]:
+        calls: dict[str, object] = {}
+
+        def fake_serve(app: object, *, host: str, port: int, log_level: str) -> None:
+            calls.update(app=app, host=host, port=port, log_level=log_level)
+
+        monkeypatch.setattr("vink.interfaces.mcp.http.serve_http", fake_serve)
+        for name in ("VINK_AUTH_TOKEN", "VINK_MCP_TRANSPORT", "VINK_MCP_HOST", "VINK_MCP_PORT"):
+            monkeypatch.delenv(name, raising=False)
+        return calls
+
+    def test_serves_http_with_token(
+        self,
+        runner: CliRunner,
+        state: CliState,
+        monkeypatch: pytest.MonkeyPatch,
+        served: dict[str, object],
+    ) -> None:
+        monkeypatch.setenv("VINK_AUTH_TOKEN", "t" * 32)
+
+        result = runner.invoke(
+            app, ["mcp", "-t", "http", "--host", "0.0.0.0", "-p", "9000"], obj=state
+        )
+
+        assert result.exit_code == 0, result.output
+        assert (served["host"], served["port"]) == ("0.0.0.0", 9000)
+        assert "bearer token required" in result.output
+
+    def test_refuses_http_without_token(
+        self, runner: CliRunner, state: CliState, served: dict[str, object]
+    ) -> None:
+        result = runner.invoke(app, ["mcp", "--transport", "http"], obj=state)
+
+        assert result.exit_code == EXIT_USAGE
+        assert "requires an access token" in result.output
+        assert not served
+
+    def test_insecure_local_mode(
+        self, runner: CliRunner, state: CliState, served: dict[str, object]
+    ) -> None:
+        result = runner.invoke(app, ["mcp", "-t", "http", "--insecure-no-auth"], obj=state)
+
+        assert result.exit_code == 0, result.output
+        assert served["host"] == "127.0.0.1"
+        assert "NO AUTHENTICATION" in result.output
+
+    def test_rejects_unknown_transport(self, runner: CliRunner, state: CliState) -> None:
+        result = runner.invoke(app, ["mcp", "-t", "carrier-pigeon"], obj=state)
+
+        assert result.exit_code == EXIT_USAGE
+        assert "Invalid VINK_MCP_TRANSPORT" in result.output

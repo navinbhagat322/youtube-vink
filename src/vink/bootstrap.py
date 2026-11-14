@@ -20,8 +20,9 @@ from vink.adapters.cache import (
 )
 from vink.adapters.render import MarkdownRenderer
 from vink.adapters.sinks import LocalDirectorySink
-from vink.adapters.youtube import OEmbedMetadataSource, YouTubeTranscriptSource
+from vink.adapters.youtube import OEmbedMetadataSource, ProxyOptions, YouTubeTranscriptSource
 from vink.config import Settings
+from vink.domain.errors import InvalidInputError
 from vink.ports.metadata_source import MetadataSource
 from vink.ports.transcript_source import TranscriptSource
 from vink.services import ExportService, TranscriptService
@@ -66,15 +67,16 @@ def build_container(settings: Settings | None = None) -> Container:
 
     Returns:
         A ready-to-use :class:`Container`.
+
+    Raises:
+        InvalidInputError: If the proxy configuration (``VINK_PROXY_URL`` or the
+            standard ``HTTPS_PROXY`` / ``HTTP_PROXY`` variables) is malformed.
     """
     resolved = settings or Settings()
-    http_client = httpx.Client(
-        timeout=resolved.http_timeout,
-        headers={"User-Agent": USER_AGENT},
-        follow_redirects=True,
-    )
+    proxy = proxy_options(resolved)
+    http_client = _http_client(resolved, proxy)
 
-    source: TranscriptSource = YouTubeTranscriptSource()
+    source: TranscriptSource = YouTubeTranscriptSource(proxy=proxy)
     metadata: MetadataSource = OEmbedMetadataSource(http_client)
     if resolved.use_cache:
         entries = TimedEntries(FileCache(resolved.cache_dir))
@@ -92,3 +94,42 @@ def build_container(settings: Settings | None = None) -> Container:
         exports=exports,
         _http_client=http_client,
     )
+
+
+def proxy_options(settings: Settings) -> ProxyOptions:
+    """Translate proxy settings into adapter options."""
+    return ProxyOptions(
+        url=settings.proxy_url.get_secret_value() if settings.proxy_url else None,
+        webshare_username=settings.webshare_username,
+        webshare_password=(
+            settings.webshare_password.get_secret_value() if settings.webshare_password else None
+        ),
+    )
+
+
+def _http_client(settings: Settings, proxy: ProxyOptions) -> httpx.Client:
+    """Create the shared HTTP client for metadata lookups.
+
+    An explicitly configured proxy wins over the standard proxy environment
+    variables, which are then ignored. Without one, those variables are honoured,
+    and a malformed value is reported clearly instead of crashing on startup.
+    """
+    explicit_proxy = proxy.http_url()
+    try:
+        return httpx.Client(
+            timeout=settings.http_timeout,
+            headers={"User-Agent": USER_AGENT},
+            follow_redirects=True,
+            proxy=explicit_proxy,
+            trust_env=explicit_proxy is None,
+        )
+    except (httpx.InvalidURL, ValueError) as exc:
+        raise InvalidInputError(
+            "Invalid proxy in the HTTPS_PROXY / HTTP_PROXY environment variables "
+            f"({_without_secrets(exc)}). Fix or remove them, or set VINK_PROXY_URL instead."
+        ) from exc
+
+
+def _without_secrets(exc: Exception) -> str:
+    """Describe a URL error without echoing the URL, which may contain a password."""
+    return str(exc).split(":", 1)[0] if "@" in str(exc) else str(exc)
