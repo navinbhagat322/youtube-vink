@@ -5,8 +5,8 @@
 <h1 align="center">vink</h1>
 
 <p align="center">
-  Turn YouTube transcripts into clean, timestamped Markdown and into complete,
-  detailed notes instead of short summaries.
+  <strong>YouTube videos into complete, detailed notes, not summaries.</strong><br>
+  Clean, timestamped transcripts for you, and an MCP server for your AI assistant.
 </p>
 
 <p align="center">
@@ -16,71 +16,97 @@
   <a href="https://github.com/navinbhagat322/youtube-vink/blob/main/LICENSE"><img src="https://img.shields.io/pypi/l/vink?cacheSeconds=3600" alt="License"></a>
 </p>
 
-## Why
+<p align="center">
+  <a href="#quickstart">Quickstart</a> ·
+  <a href="#use-it-with-your-ai-assistant">AI assistants</a> ·
+  <a href="#running-on-a-server">Hosting</a> ·
+  <a href="#configuration">Configuration</a> ·
+  <a href="https://github.com/navinbhagat322/youtube-vink/tree/main/docs">Docs</a>
+</p>
 
-Most "YouTube to notes" tools summarize. They squeeze an hour of teaching into a
-page and drop the examples, steps and asides that made the video useful. vink
-works the other way around. It extracts the full transcript YouTube already
-has, cleans it into readable paragraphs with timestamps, and serves it in parts
-so an AI client can write notes for each part without leaving anything out.
+---
+
+## Why vink?
+
+Most "YouTube to notes" tools summarize. An hour of teaching becomes a page,
+and the examples, steps and asides that made the video worth watching are
+gone.
+
+vink does the opposite. It takes the full transcript YouTube already has,
+turns it into readable, timestamped text, and hands it to your AI assistant
+**one part at a time**, so nothing is lost when notes are written.
+
+| | Typical summarizer | vink |
+|---|---|---|
+| A 1-hour lecture becomes | A few bullet points | Complete notes, section by section |
+| Examples and steps | Mostly dropped | Kept, in order |
+| Jump back to the video | Rarely | Every paragraph links to its timestamp |
+| Your notes app | Copy and paste | Markdown with front matter, ready for Obsidian |
+| Setup | Account and API key | `uvx vink`. No key needed |
 
 ## Features
 
-- **No API key.** Reads the same captions YouTube's player shows in its
-  *Show transcript* panel.
-- **Any language.** Choose preferred languages in order (`en,hi`). Manual
-  captions are preferred over auto-generated ones, with YouTube translation as
-  a fallback. Use `original` for the language spoken in the video.
-- **Readable output.** Merges caption fragments into paragraphs, removes
-  `[Music]`-style noise, and puts a clickable timestamp on every paragraph.
-- **Notes-app friendly.** Markdown with YAML front matter, ready for Obsidian
-  and similar apps.
-- **MCP server.** Lets Claude Desktop (or any MCP client) read long videos
-  chunk by chunk and write full notes, with bundled note-style prompts.
-- **Local cache.** Each transcript is fetched once; the list of available
-  languages is refreshed daily.
-- **Runs anywhere.** Serve MCP over HTTP with token authentication, or route
-  requests through a residential proxy when YouTube blocks a cloud server.
-
-## Installation
-
-Requires Python 3.11+.
-
-From PyPI, as a standalone command:
-
-```bash
-uv tool install vink      # or: pipx install vink
-vink --version
-```
-
-From source (for development), with [uv](https://docs.astral.sh/uv/):
-
-```bash
-git clone https://github.com/navinbhagat322/youtube-vink.git
-cd youtube-vink
-uv sync
-```
-
-From a source checkout, prefix the commands below with `uv run`.
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <strong>No API key</strong><br>
+      Reads the same captions YouTube shows in its <em>Show transcript</em> panel.
+    </td>
+    <td width="50%" valign="top">
+      <strong>Any language</strong><br>
+      Pick languages in order of preference (<code>hi,en</code>). Creator captions
+      are preferred, with auto-generated captions and translation as fallbacks.
+    </td>
+  </tr>
+  <tr>
+    <td valign="top">
+      <strong>Readable output</strong><br>
+      Caption fragments become paragraphs, <code>[Music]</code>-style noise is
+      removed, and every paragraph gets a clickable timestamp.
+    </td>
+    <td valign="top">
+      <strong>Built for AI assistants</strong><br>
+      An MCP server for Claude, Cursor and others, with note-writing prompts in
+      any output language, including Hinglish.
+    </td>
+  </tr>
+  <tr>
+    <td valign="top">
+      <strong>Fast repeat access</strong><br>
+      Transcripts are cached locally, so each video is fetched only once.
+    </td>
+    <td valign="top">
+      <strong>Runs anywhere</strong><br>
+      Serve over HTTP with token authentication, or use a residential proxy when
+      YouTube blocks a cloud server.
+    </td>
+  </tr>
+</table>
 
 ## Quickstart
+
+**1. Install** (Python 3.11+):
+
+```bash
+uv tool install vink        # or: pipx install vink
+```
+
+**2. Get a transcript:**
 
 ```bash
 vink transcript https://youtu.be/aircAruvnKk
 ```
 
 ```text
-/your/current/folder/output/But what is a neural network Deep learning chapter 1.md
+/your/folder/output/But what is a neural network Deep learning chapter 1.md
 ```
 
-The file looks like this:
+**3. Open the file.** It looks like this:
 
 ```markdown
 ---
 title: "But what is a neural network? | Deep learning chapter 1"
 channel: "3Blue1Brown"
-url: "https://www.youtube.com/watch?v=aircAruvnKk"
-video_id: "aircAruvnKk"
 language: "en"
 captions: "manual"
 duration: "18:25"
@@ -88,30 +114,121 @@ duration: "18:25"
 
 # But what is a neural network? | Deep learning chapter 1
 
-**Channel:** [3Blue1Brown](https://www.youtube.com/@3blue1brown) · **Duration:** 18:25 · ...
+**Channel:** 3Blue1Brown · **Duration:** 18:25 · **Language:** English (creator captions)
 
 ## Transcript
 
-**[0:04](https://youtu.be/aircAruvnKk?t=4)** This is a 3. It's sloppily written and rendered ...
+**[0:04](https://youtu.be/aircAruvnKk?t=4)** This is a 3. It's sloppily written and rendered
+at an extremely low resolution of 28x28 pixels, but your brain has no trouble ...
+
+**[0:49](https://youtu.be/aircAruvnKk?t=49)** But if I told you, hey, sit down and write for me
+a program that takes in a grid of 28x28 pixels ...
 ```
 
-## Usage: CLI
+## Use it with your AI assistant
+
+vink includes an [MCP](https://modelcontextprotocol.io) server. Your assistant
+reads the transcript part by part and writes full notes, with no API key and
+nothing extra to pay.
+
+### Claude Desktop
+
+Add this to `claude_desktop_config.json`
+(macOS: `~/Library/Application Support/Claude/`, Windows: `%APPDATA%\Claude\`),
+then restart Claude:
+
+```json
+{
+  "mcpServers": {
+    "vink": {
+      "command": "uvx",
+      "args": ["vink", "mcp"]
+    }
+  }
+}
+```
+
+Then ask:
+
+> Make detailed notes from https://youtu.be/aircAruvnKk in Hinglish and save them.
+
+Or choose **+ → Add from vink → make_notes**.
+
+<details>
+<summary><strong>Claude Code</strong></summary>
+
+```bash
+claude mcp add vink --scope user -- uvx vink mcp
+```
+
+</details>
+
+<details>
+<summary><strong>Cursor</strong></summary>
+
+Add to `~/.cursor/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "vink": { "command": "uvx", "args": ["vink", "mcp"] }
+  }
+}
+```
+
+</details>
+
+<details>
+<summary><strong>VS Code (GitHub Copilot)</strong></summary>
+
+```bash
+code --add-mcp '{"name":"vink","command":"uvx","args":["vink","mcp"]}'
+```
+
+</details>
+
+<details>
+<summary><strong>Any other MCP client</strong></summary>
+
+Most clients accept the standard block:
+
+```json
+{
+  "mcpServers": {
+    "vink": { "command": "uvx", "args": ["vink", "mcp"] }
+  }
+}
+```
+
+If the client cannot find `uvx`, use its full path (run `which uvx`).
+
+</details>
+
+### What your assistant can do
+
+| Tool | What it does |
+|------|--------------|
+| `list_languages` | Lists the caption languages a video has |
+| `get_video_info` | Title, language, duration and number of parts |
+| `get_chunk` | One part of the transcript, as Markdown |
+| `get_transcript` | The whole transcript, for short videos |
+| `save_transcript` | Saves the transcript as a Markdown file |
+| `save_notes` | Saves the notes your assistant wrote |
+
+Two note styles are included: **detailed-notes**, complete study notes (the
+default), and **clean-transcript**, an edited transcript that stays close to
+word for word. Files are saved to `~/Documents/vink` unless you set
+`VINK_OUTPUT_DIR`.
+
+More details: [docs/mcp.md](https://github.com/navinbhagat322/youtube-vink/blob/main/docs/mcp.md).
+
+## Command line
 
 ```text
-vink transcript URL [--lang en,hi] [--output-dir DIR] [--stdout]
-                    [--translate | --no-translate] [--cache | --no-cache]
-vink languages URL
-vink mcp [--transport stdio|http] [--host HOST] [--port PORT]
-vink --version
+vink transcript URL   Save a transcript as Markdown
+vink languages URL    List the caption languages a video has
+vink mcp              Run the MCP server
 ```
-
-| Command | What it does |
-|---------|--------------|
-| `transcript` | Fetches a transcript and saves it as Markdown (or prints it with `--stdout`). |
-| `languages` | Lists the caption tracks a video has. |
-| `mcp` | Runs the MCP server: over stdio for local clients (default), or over HTTP for remote ones. |
-
-Examples:
 
 ```bash
 # Hindi if available, otherwise English
@@ -119,121 +236,138 @@ vink transcript https://youtu.be/VIDEO_ID --lang hi,en
 
 # The language spoken in the video, printed to the terminal
 vink transcript VIDEO_ID --lang original --stdout
-
-# See what is available first
-vink languages https://youtu.be/VIDEO_ID
 ```
 
-Add `-v` before the command for progress logs, e.g. `vink -v transcript ...`.
+<details>
+<summary><strong>All options</strong></summary>
+
+```text
+vink transcript URL [--lang en,hi] [--output-dir DIR] [--format markdown] [--stdout]
+                    [--translate | --no-translate] [--cache | --no-cache]
+vink languages URL [--cache | --no-cache]
+vink mcp [--transport stdio|http] [--host HOST] [--port PORT] [--insecure-no-auth]
+vink [-v | --verbose] [--version] COMMAND
+```
+
+| Option | Meaning |
+|--------|---------|
+| `--lang` | Preferred languages, most preferred first. `original` means the spoken language. |
+| `--stdout` | Print instead of saving a file. |
+| `--no-translate` | Never fall back to YouTube's machine translation. |
+| `--no-cache` | Fetch fresh data from YouTube. |
+| `-v` | Show progress logs (place it before the command). |
 
 Exit codes: `0` success, `1` the transcript could not be fetched, `2` invalid
 input or options.
 
-## Usage: MCP (Claude Desktop)
-
-Add vink to your Claude Desktop config. On macOS it is at
-`~/Library/Application Support/Claude/claude_desktop_config.json`:
-
-```json
-{
-  "mcpServers": {
-    "vink": {
-      "command": "uvx",
-      "args": ["vink", "mcp"],
-      "env": { "VINK_LANGUAGES": "en" }
-    }
-  }
-}
-```
-
-Notes are saved to `~/Documents/vink` unless you set `VINK_OUTPUT_DIR` in
-`env`. If Claude Desktop cannot find `uvx`, use its absolute path (`which uvx`).
-To run from a source checkout, see [docs/mcp.md](docs/mcp.md).
-
-Restart Claude Desktop, then either:
-
-- choose the **make_notes** prompt, enter a video URL, and optionally a style
-  and output language (for example `Hinglish`), or
-- just ask: *"Make detailed notes from https://youtu.be/VIDEO_ID and save them."*
-
-| Tool | Purpose |
-|------|---------|
-| `list_languages` | Caption languages available for a video |
-| `get_video_info` | Title, language, duration and number of parts |
-| `get_chunk` | One part of the transcript as Markdown |
-| `get_transcript` | The whole transcript (best for short videos) |
-| `save_transcript` | Save the transcript as a Markdown file |
-| `save_notes` | Save notes the client has written |
-
-Bundled note styles: `detailed-notes` (default) and `clean-transcript`.
-See [docs/mcp.md](docs/mcp.md) for details and setup for other clients.
+</details>
 
 ## Running on a server
 
 YouTube blocks most requests from cloud servers (AWS, GCP, hosted sandboxes).
-vink supports two ways around it:
+On your own computer everything just works. For servers, pick one of these:
 
-- **Host it at home and connect remotely.** Run vink over HTTP on a machine
-  with a residential connection and publish it with a tunnel. No proxy needed.
+| | Host at home | Residential proxy |
+|---|---|---|
+| **Idea** | Run vink on a home machine; connect to it over HTTPS | Run vink anywhere; send YouTube traffic through a proxy |
+| **Cost** | Free | Paid proxy plan |
+| **Key setting** | `VINK_AUTH_TOKEN` | `VINK_PROXY_URL` |
 
-  ```bash
-  VINK_AUTH_TOKEN='a-long-random-secret' vink mcp --transport http --port 8000
-  ```
+Host at home:
 
-- **Use a residential proxy** wherever vink runs:
+```bash
+VINK_AUTH_TOKEN='a-long-random-secret' vink mcp --transport http --port 8000
+```
 
-  ```bash
-  VINK_PROXY_URL=http://user:pass@proxy.example.com:8080 vink mcp
-  ```
+Residential proxy:
 
-  Webshare rotating proxies are supported natively via
-  `VINK_WEBSHARE_USERNAME` and `VINK_WEBSHARE_PASSWORD`.
+```bash
+VINK_PROXY_URL='http://user:pass@proxy.example.com:8080' vink mcp
+```
 
-Step-by-step instructions, including Cloudflare Tunnel and systemd, are in
-[docs/hosting.md](docs/hosting.md).
+Webshare rotating residential proxies are supported out of the box via
+`VINK_WEBSHARE_USERNAME` and `VINK_WEBSHARE_PASSWORD`.
+
+The step-by-step guide covers Cloudflare Tunnel, systemd and troubleshooting:
+[docs/hosting.md](https://github.com/navinbhagat322/youtube-vink/blob/main/docs/hosting.md).
 
 ## Configuration
 
-Every setting has a sensible default and can be set with an environment
-variable or a `.env` file. Common ones:
+Everything works without configuration. To change a default, set an
+environment variable or put it in a `.env` file:
 
-| Variable | Default | Meaning |
-|----------|---------|---------|
+| Variable | Default | What it does |
+|----------|---------|--------------|
 | `VINK_LANGUAGES` | `en` | Preferred languages, comma-separated |
-| `VINK_OUTPUT_DIR` | `output` (CLI), `~/Documents/vink` (MCP) | Where files are saved |
+| `VINK_OUTPUT_DIR` | `./output` (CLI), `~/Documents/vink` (MCP) | Where files are saved |
 | `VINK_CHUNK_SECONDS` | `600` | Length of one part for `get_chunk` |
 | `VINK_PROXY_URL` | none | Proxy for requests to YouTube |
-| `VINK_AUTH_TOKEN` | none | Required token for `vink mcp --transport http` |
+| `VINK_AUTH_TOKEN` | none | Token required by the HTTP server |
 
-The full list is in [docs/configuration.md](docs/configuration.md).
+All settings: [docs/configuration.md](https://github.com/navinbhagat322/youtube-vink/blob/main/docs/configuration.md).
 
 ## How it works
 
+```text
+YouTube URL
+   │
+   ├─ pick the best caption track   (your languages · creator > auto > translated)
+   ├─ fetch and cache it
+   ├─ clean it into paragraphs       (noise removed · timestamps kept)
+   ├─ split it into ~10-minute parts
+   └─ Markdown file  ──or──  MCP tools → your AI assistant → detailed notes
 ```
-URL → caption track selection → fetch → clean → paragraphs → chunks → Markdown → file
-```
 
-vink uses a ports-and-adapters architecture. Fetching, rendering and saving
-each sit behind a small interface, so new output formats (PDF, DOCX) and
-destinations (Notion, Obsidian) can be added without touching the core. See
-[docs/architecture.md](docs/architecture.md).
+Fetching, rendering and saving each sit behind a small interface, so new
+formats (PDF, DOCX) and destinations (Notion, Obsidian) can be added without
+touching the core. See
+[docs/architecture.md](https://github.com/navinbhagat322/youtube-vink/blob/main/docs/architecture.md).
 
-## Limitations
+## FAQ
 
-- Only videos that have captions (manual or auto-generated) are supported.
-  Transcribing audio for videos without captions is planned.
-- YouTube often blocks requests from cloud-server IP addresses. See
-  [Running on a server](#running-on-a-server).
-- vink uses YouTube's internal caption endpoints through
-  [`youtube-transcript-api`](https://github.com/jdepoix/youtube-transcript-api).
-  These can change without notice. Keep dependencies up to date.
-- Playlists are not supported yet.
+<details>
+<summary><strong>Do I need a YouTube API key?</strong></summary>
+
+No. The official YouTube Data API only lets you download captions for videos
+you own. vink reads the same caption data YouTube's own player uses, through the
+open-source
+[`youtube-transcript-api`](https://github.com/jdepoix/youtube-transcript-api)
+library.
+
+</details>
+
+<details>
+<summary><strong>Does it work for videos without captions?</strong></summary>
+
+Not yet. vink needs either creator-uploaded or auto-generated captions.
+Transcribing the audio of videos without captions is planned.
+
+</details>
+
+<details>
+<summary><strong>Can I get notes in Hindi, Hinglish or another language?</strong></summary>
+
+Yes. The transcript can be in any language the video has, and the
+`make_notes` prompt can write the notes in any language you name, including
+Hinglish.
+
+</details>
+
+<details>
+<summary><strong>Why does it say "YouTube is blocking requests"?</strong></summary>
+
+You are running vink on a cloud server, and YouTube blocks data-center IP
+addresses. See [Running on a server](#running-on-a-server).
+
+</details>
 
 ## Contributing
 
-Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for setup,
-workflow and conventions.
+Contributions are welcome: bug reports, new output formats, destinations and
+note styles. See
+[CONTRIBUTING.md](https://github.com/navinbhagat322/youtube-vink/blob/main/CONTRIBUTING.md)
+to get started.
 
 ## License
 
-[MIT](LICENSE)
+[MIT](https://github.com/navinbhagat322/youtube-vink/blob/main/LICENSE)
