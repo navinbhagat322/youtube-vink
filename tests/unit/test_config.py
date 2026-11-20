@@ -171,3 +171,24 @@ class TestBootstrapProxy:
         assert options.webshare_username == "alice"
         assert options.webshare_password == "s3cret"
         assert options.enabled
+
+
+class TestEmptyEnvironmentValues:
+    @pytest.mark.parametrize(
+        "name",
+        [
+            "VINK_PROXY_URL",
+            "VINK_WEBSHARE_USERNAME",
+            "VINK_WEBSHARE_PASSWORD",
+            "VINK_LANGUAGES",
+            "VINK_OUTPUT_DIR",
+            "VINK_AUTH_TOKEN",
+        ],
+    )
+    def test_empty_value_means_not_set(self, monkeypatch: pytest.MonkeyPatch, name: str) -> None:
+        monkeypatch.setenv(name, "")
+
+        settings = Settings()
+
+        assert settings == Settings.model_validate({})
+        assert name.removeprefix("VINK_").lower() not in settings.model_fields_set

@@ -33,6 +33,9 @@ class Settings(BaseSettings):
         env_prefix="VINK_",
         env_file=".env",
         env_file_encoding="utf-8",
+        # Treat VINK_X= (empty) as "not set". Installers such as Claude Desktop
+        # extensions pass optional fields the user left blank as empty strings.
+        env_ignore_empty=True,
         extra="ignore",
         frozen=True,
     )
