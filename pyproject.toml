@@ -1,6 +1,6 @@
 [project]
 name = "vink"
-version = "0.2.0"
+version = "0.3.0"
 description = "Turn YouTube transcripts into clean, timestamped Markdown — and full, detailed notes."
 readme = "README.md"
 license = "MIT"

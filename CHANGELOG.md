@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-19
+
+### Added
+
+- Claude Desktop extension: every GitHub release now includes
+  `vink-<version>.mcpb`. Double-click to install; Claude shows a form for
+  languages, the save folder and optional proxy settings. No JSON editing.
+- `python -m vink` works as an alternative to the `vink` command.
+
+### Fixed
+
+- Empty settings such as `VINK_PROXY_URL=` are now treated as unset instead of
+  failing validation. Installers pass blank optional fields this way.
+
+### Changed
+
+- The README leads with the one-click extension and explains how to avoid
+  slow first starts with `uvx`.
+
 ## [0.2.0] - 2026-11-14
 
 ### Added
@@ -74,7 +93,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Configuration through `VINK_*` environment variables or a `.env` file.
 - Distribution on PyPI (`uv tool install vink`, `uvx vink mcp`).
 
-[Unreleased]: https://github.com/navinbhagat322/youtube-vink/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/navinbhagat322/youtube-vink/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/navinbhagat322/youtube-vink/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/navinbhagat322/youtube-vink/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/navinbhagat322/youtube-vink/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/navinbhagat322/youtube-vink/releases/tag/v0.1.0
