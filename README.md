@@ -131,7 +131,25 @@ vink includes an [MCP](https://modelcontextprotocol.io) server. Your assistant
 reads the transcript part by part and writes full notes, with no API key and
 nothing extra to pay.
 
-### Claude Desktop
+### Claude Desktop: one-click install
+
+1. Download **`vink-<version>.mcpb`** from the
+   [latest release](https://github.com/navinbhagat322/youtube-vink/releases/latest).
+2. Double-click it, or drag it into Claude Desktop's **Settings → Extensions**.
+3. Click **Install**. Optionally pick your languages and save folder in the
+   form Claude shows.
+
+Then ask:
+
+> Make detailed notes from https://youtu.be/aircAruvnKk in Hinglish and save them.
+
+Or choose **+ → Add from vink → make_notes**.
+
+The extension runs vink with [uv](https://docs.astral.sh/uv/). If Claude
+reports that `uv` is missing, install it first.
+
+<details>
+<summary><strong>Claude Desktop: manual setup</strong></summary>
 
 Add this to `claude_desktop_config.json`
 (macOS: `~/Library/Application Support/Claude/`, Windows: `%APPDATA%\Claude\`),
@@ -148,11 +166,7 @@ then restart Claude:
 }
 ```
 
-Then ask:
-
-> Make detailed notes from https://youtu.be/aircAruvnKk in Hinglish and save them.
-
-Or choose **+ → Add from vink → make_notes**.
+</details>
 
 <details>
 <summary><strong>Claude Code</strong></summary>
@@ -203,6 +217,10 @@ Most clients accept the standard block:
 If the client cannot find `uvx`, use its full path (run `which uvx`).
 
 </details>
+
+> **Tip for `uvx` setups:** run `uvx vink --version` once in a terminal before
+> adding vink to a client. The first run downloads vink's dependencies, which
+> can take longer than a client is willing to wait for a server to start.
 
 ### What your assistant can do
 

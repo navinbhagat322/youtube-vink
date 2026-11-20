@@ -52,6 +52,12 @@ ports, never on adapters.
 
 ## Common changes
 
+**Change MCP tools or settings**: also update the Claude Desktop extension
+manifest, `packaging/mcpb/manifest.json`. Tests fail if its tool list or
+environment variables drift from the code. Build it locally with
+`uv run python scripts/build_mcpb.py` (needs Node.js).
+
+
 **Add an output format** (e.g. PDF): implement the `Renderer` protocol in
 `src/vink/adapters/render/`, register it in `bootstrap.py`, and add a golden
 file test in `tests/unit/adapters/`.

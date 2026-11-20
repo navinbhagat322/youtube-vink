@@ -7,7 +7,26 @@ no AI model itself: your client writes the notes, so vink needs no API key.
 
 ## Setup
 
-### Claude Desktop
+### Claude Desktop extension (easiest)
+
+Each [GitHub release](https://github.com/navinbhagat322/youtube-vink/releases/latest)
+includes `vink-<version>.mcpb`, a Claude Desktop extension. Double-click it, or
+drag it into **Settings → Extensions**, and click **Install**. Claude shows a
+form for the optional settings:
+
+| Setting | Default | Maps to |
+|---------|---------|---------|
+| Transcript languages | `en` | `VINK_LANGUAGES` |
+| Save folder | `Documents/vink` | `VINK_OUTPUT_DIR` |
+| Webshare proxy username / password | empty | `VINK_WEBSHARE_USERNAME` / `VINK_WEBSHARE_PASSWORD` |
+| Other proxy URL | empty | `VINK_PROXY_URL` |
+
+Leave the proxy fields empty on a home or office connection. The extension uses
+the MCPB `uv` server type: it contains vink's source and lock file, and
+dependencies are installed with [uv](https://docs.astral.sh/uv/) rather than
+bundled.
+
+### Claude Desktop (manual)
 
 Edit `claude_desktop_config.json`:
 
