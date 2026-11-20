@@ -1,0 +1,97 @@
+{
+  "$schema": "https://raw.githubusercontent.com/modelcontextprotocol/mcpb/main/schemas/mcpb-manifest-v0.4.schema.json",
+  "manifest_version": "0.4",
+  "name": "vink",
+  "display_name": "vink: YouTube transcripts to notes",
+  "version": "0.0.0",
+  "description": "Read YouTube transcripts part by part and turn them into complete, detailed notes instead of short summaries.",
+  "long_description": "vink fetches the captions YouTube already has (no API key needed), cleans them into readable, timestamped paragraphs, and serves them in parts so Claude can write complete notes for each part without dropping examples or steps.\n\nAsk for example: \"Make detailed notes from https://youtu.be/VIDEO_ID in Hinglish and save them.\" Or use the make_notes prompt.\n\nNotes are saved as Markdown with front matter, ready for Obsidian and other notes apps.",
+  "author": {
+    "name": "vink contributors",
+    "url": "https://github.com/navinbhagat322/youtube-vink"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/navinbhagat322/youtube-vink"
+  },
+  "homepage": "https://github.com/navinbhagat322/youtube-vink",
+  "documentation": "https://github.com/navinbhagat322/youtube-vink/blob/main/docs/mcp.md",
+  "support": "https://github.com/navinbhagat322/youtube-vink/issues",
+  "icon": "icon.png",
+  "keywords": ["youtube", "transcript", "captions", "notes", "markdown", "study"],
+  "license": "MIT",
+  "privacy_policies": ["https://policies.google.com/privacy"],
+  "server": {
+    "type": "uv",
+    "entry_point": "src/vink/__main__.py",
+    "mcp_config": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--directory",
+        "${__dirname}",
+        "--frozen",
+        "--no-dev",
+        "--quiet",
+        "vink",
+        "mcp"
+      ],
+      "env": {
+        "VINK_LANGUAGES": "${user_config.languages}",
+        "VINK_OUTPUT_DIR": "${user_config.output_dir}",
+        "VINK_WEBSHARE_USERNAME": "${user_config.webshare_username}",
+        "VINK_WEBSHARE_PASSWORD": "${user_config.webshare_password}",
+        "VINK_PROXY_URL": "${user_config.proxy_url}"
+      }
+    }
+  },
+  "tools": [
+    { "name": "list_languages", "description": "List the caption languages available for a YouTube video." },
+    { "name": "get_video_info", "description": "Get title, language and the number of transcript parts for a video." },
+    { "name": "get_chunk", "description": "Get one part of a video's transcript as timestamped Markdown." },
+    { "name": "get_transcript", "description": "Get a video's complete transcript as timestamped Markdown." },
+    { "name": "save_transcript", "description": "Save a video's transcript as a Markdown file." },
+    { "name": "save_notes", "description": "Save notes written for a video as a Markdown file." }
+  ],
+  "prompts_generated": true,
+  "compatibility": {
+    "platforms": ["darwin", "win32", "linux"],
+    "runtimes": { "python": ">=3.11" }
+  },
+  "user_config": {
+    "languages": {
+      "type": "string",
+      "title": "Transcript languages",
+      "description": "Preferred caption languages, most preferred first, comma-separated (for example: en or hi,en). Use 'original' for the language spoken in the video.",
+      "default": "en",
+      "required": false
+    },
+    "output_dir": {
+      "type": "directory",
+      "title": "Save folder",
+      "description": "Where saved transcripts and notes are written.",
+      "default": "${DOCUMENTS}/vink",
+      "required": false
+    },
+    "webshare_username": {
+      "type": "string",
+      "title": "Webshare proxy username (optional)",
+      "description": "Only needed on networks YouTube blocks, such as cloud servers. Use a Webshare residential proxy plan.",
+      "required": false
+    },
+    "webshare_password": {
+      "type": "string",
+      "title": "Webshare proxy password (optional)",
+      "description": "Password for the Webshare proxy username above.",
+      "sensitive": true,
+      "required": false
+    },
+    "proxy_url": {
+      "type": "string",
+      "title": "Other proxy URL (optional)",
+      "description": "Any HTTP(S) proxy instead of Webshare, for example http://user:pass@proxy.example.com:8080. Leave empty if you use Webshare or no proxy.",
+      "sensitive": true,
+      "required": false
+    }
+  }
+}

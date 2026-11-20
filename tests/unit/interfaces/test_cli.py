@@ -205,3 +205,15 @@ class TestMcpHttpCommand:
 
         assert result.exit_code == EXIT_USAGE
         assert "Invalid VINK_MCP_TRANSPORT" in result.output
+
+
+def test_python_dash_m_runs_the_cli() -> None:
+    import subprocess
+    import sys
+
+    result = subprocess.run(
+        [sys.executable, "-m", "vink", "--version"], capture_output=True, text=True, check=False
+    )
+
+    assert result.returncode == 0
+    assert result.stdout.strip() == f"vink {__version__}"

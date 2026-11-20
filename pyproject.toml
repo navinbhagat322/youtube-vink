@@ -113,7 +113,7 @@ ban-relative-imports = "all"
 python_version = "3.11"
 strict = true
 warn_unreachable = true
-files = ["src", "tests"]
+files = ["src", "tests", "scripts"]
 mypy_path = "src"
 
 [[tool.mypy.overrides]]
